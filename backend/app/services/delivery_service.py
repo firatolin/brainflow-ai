@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import HTTPException, status as http_status
 from sqlalchemy.orm import Session
@@ -194,7 +194,7 @@ def change_status(db: Session, delivery_id: int, target: DeliveryStatus, note: s
     prev = delivery.status
     delivery.status = target
     if target == DeliveryStatus.DELIVERED and delivery.actual_arrival is None:
-        delivery.actual_arrival = datetime.utcnow()
+        delivery.actual_arrival = datetime.now(timezone.utc)
 
     record_history(
         db, delivery.id, "status_changed",

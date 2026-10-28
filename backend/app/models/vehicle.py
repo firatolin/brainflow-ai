@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, DateTime, Enum, Float, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -38,9 +38,9 @@ class Vehicle(Base):
     location_zone: Mapped[str] = mapped_column(String(120), default="central")
     available: Mapped[bool] = mapped_column(Boolean, default=True)
     cost_per_km: Mapped[float] = mapped_column(Float, default=1.0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
     deliveries = relationship("Delivery", back_populates="vehicle", foreign_keys="Delivery.vehicle_id")
