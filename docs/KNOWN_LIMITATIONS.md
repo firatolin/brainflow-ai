@@ -1,137 +1,91 @@
+
 # Known Limitations
 
-Honest list of what this demo build does **not** do, and why. All decisions are documented so a reviewer can judge scope clearly.
+## Scope
 
----
-
-## Scope and data
-
-- **Demonstration data only.** All deliveries, vehicles, customers, and outcomes are synthetic. The seed script generates ~43 deliveries and 6 vehicles deterministically.
-- **No real external logistics integrations.** No carrier API, no live GPS, no real customer notifications. Customer messages are **drafts only**, never sent.
-- **No real payments, invoicing, or financial systems.**
-- **No historical dataset** — risk scores are a rule-based estimate, **not a trained ML model**.
-
----
+- Demonstration data only — all deliveries, vehicles, outcomes synthetic
+- No real external logistics integrations
+- No payments/invoicing
+- No historical dataset — rule-based risk, not trained ML
 
 ## Risk engine
 
-- **Rule-based, not statistically trained.** The formula is documented in `docs/ARCHITECTURE.md` and the code. It is deterministic and reproducible.
-- **The confidence value is a heuristic**, not a statistical confidence interval.
-- **Average speed is a fixed assumption** (25 km/h) used to estimate travel time from distance. A real system would use routing APIs or historical driving data.
+- Rule-based (documented formula), not statistically trained
+- Confidence heuristic, not statistical interval
+- Fixed 25 km/h travel assumption
 
----
+## Optimizer
 
-## Optimizer / planner
-
-- **Greedy heuristic, not optimal.** We explicitly do not claim to solve a VRP. The planner is a local-improvement algorithm with a feasibility repair pass.
-- **No vehicle sequencing model.** The planner changes assignments but does not compute per-vehicle delivery order.
-- **No multi-depot, multi-shift, or time-window models.**
-- **Assumed distances and costs** are taken from the seed data, not from external routing.
-
----
+- Greedy heuristic, not optimal
+- No vehicle sequencing (only assignments)
+- No multi-depot / time-window modeling
+- Distances/costs from seed data
 
 ## Simulations
 
-- **Estimate only.** The simulator computes delay using the same travel-time model as the risk engine. Real outcomes would vary.
-- **The synthetic "urgent_added" scenario** injects a delivery with an in-memory negative ID; it is never persisted.
-- **No stochasticity.** Simulations are deterministic — running the same scenario twice produces the same numbers.
+- Estimate only
+- urgent_added uses in-memory negative ID — never persisted
+- Deterministic (no stochasticity)
 
----
+## AI
 
-## AI / LLM
+- LLM optional; deterministic path when no key
+- No function calling — rephrases only
+- No conversation memory
+- Real Gemini provider not asserted in tests (fallback path only)
 
-- **LLM is optional.** When `GEMINI_API_KEY` is missing, all answers are deterministic. The UI labels them `deterministic fallback`.
-- **No function calling.** The LLM is used only to rephrase prose. It cannot call tools, run queries, or trigger actions.
-- **No conversation memory across requests.** Each copilot query is stateless.
-- **The customer draft LLM polish** is not asserted by tests against the real provider — only the deterministic path is verified in CI.
+## Auth
 
----
+- Single admin — no sign-up or user management
+- No roles / RBAC
+- No CSRF token (SameSite=Lax + POST-only + CORS)
+- No password rotation flow
+- Reads public for demo friendliness
+- No login rate limiting
 
-## Authentication / authorization
+## External
 
-- **Single admin user only.** Created from `.env` credentials at seed time. No sign-up, no user management, no profile editing.
-- **No roles / RBAC.** All authenticated actions are attributed to the same admin.
-- **No CSRF token.** We rely on `HttpOnly` + `SameSite=Lax` cookies + POST-only mutations + same-origin CORS. Adequate for a demo; **not** what you'd ship publicly.
-- **No password rotation flow.** To change the password: edit `ADMIN_PASSWORD` in `.env`, delete `backend/brainflow.db`, run `alembic upgrade head` and `python -m scripts.seed`.
-- **Read endpoints are public.** Intentional (browsing the demo without login). Mutations require auth.
-- **No account lockout or rate limiting on `/api/auth/login`.**
+- Open-Meteo / Nager.Date optional; fallbacks only exercised in CI
+- In-memory cache only (cleared on restart)
+- COOKIE_SECURE=false default
 
----
+## Scheduler
 
-## External integrations
-
-- **Open-Meteo and Nager.Date are optional.** If unreachable, deterministic demo values (weather) or an empty list (holidays) are returned. Both paths are handled but only the fallback is exercised in CI.
-- **No caching across process restarts.** In-memory `dict` cache only; restarts clear it.
-- **No proxy-aware HTTPS handling.** `COOKIE_SECURE=false` by default (localhost). Set `COOKIE_SECURE=true` behind HTTPS.
-
----
-
-## Background scheduler
-
-- **In-process APScheduler.** Runs in the same worker as the API. Not intended for **multi-instance** deployment — you would need a distributed scheduler (Redis + Celery or similar) for that.
-- **No persistence of job store.** If the app restarts, the schedule restarts from the next interval.
-- **Disableable via `SCHEDULER_ENABLED=false`.**
-- **Not exercised by automated tests** to avoid flaky timing; verified manually during development (see `docs/TESTING.md`).
-
----
+- In-process APScheduler — not multi-instance safe
+- No persistent job store (schedule restarts on app restart)
+- Disableable via SCHEDULER_ENABLED=false
 
 ## Frontend
 
-- **Single ~1 MB JS chunk.** Vite warns at >500 kB. Route-level code splitting (`React.lazy` per page) would reduce it; **not implemented** in this build.
-- **No dark mode.** The design system is deliberately light/neutral; dark mode tokens exist but the UI does not expose a toggle.
-- **No mobile bottom-nav.** The sidebar hides on small screens; only the desktop experience is polished. Responsive behavior is limited to hiding the sidebar.
-- **Very small number of frontend tests.** 16 tests across 6 files, focused on critical components and flows. Full coverage of all 11 pages is **not** present.
-- **No Playwright E2E tests** in the default `npm run test` — the workflow is exercised manually per `docs/DEMO_GUIDE.md`.
-
----
+- Single ~1 MB bundle — route splitting is a follow-up
+- No dark mode toggle (tokens exist)
+- No mobile bottom-nav (sidebar hides)
+- 16 frontend tests focus on critical flows, not full coverage
+- Playwright E2E not included by default
 
 ## Lint
 
-- **3 informational warnings** (`react-hooks/incompatible-library` for React Hook Form's `watch()` — memoization is skipped, functionally irrelevant).
-- **1 file-scoped disable** (`useAuth.tsx`) for `react-refresh/only-export-components` + `react-hooks/set-state-in-effect` — a documented, safe pattern for the async status fetch on mount.
-
-`npm run lint` outputs **0 errors, 3 warnings**.
-
----
+- 3 informational warnings (react-hooks/incompatible-library for React Hook Form's watch())
+- 1 file-scoped disable in useAuth.tsx with rationale in code
+- npm run lint → 0 errors, 3 warnings
 
 ## Testing gaps
 
-- **No performance / load tests.** Not applicable for a demo.
-- **No a11y automated audit** (axe-core). Semantic HTML is used but not asserted.
-- **No visual regression tests.**
-- **No test for the real Gemini provider.** Only the fallback path is verified.
-- **No test for live weather/holiday responses.** Only the fallback path is verified.
-
----
+- No performance / load tests
+- No automated a11y audit
+- No visual regression
+- No test for real Gemini or live Open-Meteo/Nager.Date
 
 ## Operational
 
-- **SQLite is used by default.** Works fine for the demo (single-writer, tiny data). The `DATABASE_URL` can be pointed at PostgreSQL but that path is not exercised by CI.
-- **No migrations rollback UI.** Standard Alembic commands only.
-- **No backups.**
-- **No metrics/observability stack.** `/api/health` returns structured status.
+- SQLite default (fine for demo)
+- No backups
+- No metrics / observability beyond /api/health
 
----
+## Intentionally not limitations
 
-## What is intentionally *not* a limitation
-
-For clarity, these are **by design** and would still apply to a production build:
-
-- No automatic customer notifications — drafts only, requires human action
-- Risk scores are labelled as rule-based, not ML
-- Customer drafts are always marked `requires_human_review: true`
-- Execution requires approval; revalidation prevents stale application
-- Audit trail is append-only
-
----
-
-## If this were extended
-
-- Add a **stochastic or history-based** risk model once real data exists
-- Add **per-vehicle sequencing** to the planner
-- Add **authentication with multiple roles** (operator, manager, admin)
-- Add **Playwright E2E** for the full demo workflow
-- **Route-split** the frontend bundle
-- **Distribute** the scheduler with Redis / Celery and a persistent job store
-- Add **CSRF tokens** and rate limiting on auth endpoints
-- Add **PostgreSQL** integration tests and a migration CI
+- No auto-send customer messages — drafts only (by design)
+- Risk scores labeled rule-based (by design)
+- Drafts marked requires_human_review: true (by design)
+- Execution requires approval (by design)
+- Audit append-only (by design)
