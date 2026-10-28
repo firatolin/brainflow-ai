@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,10 +32,12 @@ export default function LoginPage() {
     defaultValues: { username: "", password: "" },
   });
 
-  // If already logged in, bounce to Overview
-  if (state.status === "authenticated") {
-    navigate("/", { replace: true });
-  }
+  // If already logged in, bounce to Overview (in an effect, not during render)
+  useEffect(() => {
+    if (state.status === "authenticated") {
+      navigate("/", { replace: true });
+    }
+  }, [state.status, navigate]);
 
   const onSubmit = async (values: FormValues) => {
     setServerError(null);
