@@ -6,6 +6,9 @@ import OverviewPage from "@/pages/OverviewPage";
 import DeliveriesPage from "@/pages/deliveries/DeliveriesPage";
 import DeliveryDetailPage from "@/pages/deliveries/DeliveryDetailPage";
 import FleetPage from "@/pages/fleet/FleetPage";
+import ExceptionsPage from "@/pages/exceptions/ExceptionsPage";
+import RecoveryPage from "@/pages/recovery/RecoveryPage";
+import SimulationsPage from "@/pages/simulations/SimulationsPage";
 
 function NotFound() {
   return (
@@ -26,6 +29,9 @@ export default function App() {
           <Route path="deliveries" element={<DeliveriesPage />} />
           <Route path="deliveries/:id" element={<DeliveryDetailPage />} />
           <Route path="fleet" element={<FleetPage />} />
+          <Route path="exceptions" element={<ExceptionsPage />} />
+          <Route path="recovery" element={<RecoveryPage />} />
+          <Route path="simulations" element={<SimulationsPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>

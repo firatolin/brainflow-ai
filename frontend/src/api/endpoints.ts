@@ -215,3 +215,153 @@ export type CustomerDraft = {
 export const customerDraftsApi = {
   get: (id: number) => api.get<CustomerDraft>(`/customer-drafts/${id}`),
 };
+
+// ===== Incidents =====
+export type IncidentSeverity = "low" | "medium" | "high" | "critical";
+export type IncidentStatus = "open" | "acknowledged" | "resolved";
+
+export type Incident = {
+  id: number;
+  kind: string;
+  entity_type: string;
+  entity_id: number | null;
+  discriminator: string;
+  severity: IncidentSeverity;
+  status: IncidentStatus;
+  title: string;
+  description: string;
+  evidence_json: string;
+  suggested_action: string;
+  created_at: string;
+  updated_at: string;
+  acknowledged_at: string | null;
+  resolved_at: string | null;
+  resolution_note: string | null;
+};
+
+export type IncidentPage = {
+  items: Incident[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+};
+
+export const incidentsApi = {
+  list: (params: {
+    page?: number; page_size?: number;
+    status?: string; severity?: string;
+    kind?: string; entity_type?: string;
+    sort?: string; order?: "asc" | "desc";
+  }) => api.get<IncidentPage>(`/incidents${buildQuery(params)}`),
+  scan: () => api.post<ScanRunResponse>("/incidents/scan"),
+  update: (id: number, payload: { status: IncidentStatus; resolution_note?: string | null }) =>
+    api.patch<Incident>(`/incidents/${id}`, payload),
+};
+
+// ===== Plans =====
+export type PlanKind = "baseline" | "minimize_delays" | "balanced";
+export type PlanStatus = "draft" | "submitted" | "approved" | "rejected" | "executed" | "cancelled";
+
+export type PlanItem = {
+  id: number;
+  delivery_id: number;
+  from_vehicle_id: number | null;
+  to_vehicle_id: number | null;
+  sequence_position: number;
+  expected_delay_minutes: number;
+  expected_late: boolean;
+};
+
+export type RecoveryPlan = {
+  id: number;
+  kind: PlanKind;
+  status: PlanStatus;
+  expected_late_count: number;
+  expected_total_delay_minutes: number;
+  expected_priority_weighted_delay: number;
+  expected_cost: number;
+  expected_additional_travel_km: number;
+  changes_count: number;
+  feasible: boolean;
+  infeasibility_reasons_json: string;
+  explanation: string;
+  created_at: string;
+  items: PlanItem[];
+};
+
+export type PlanPage = {
+  items: RecoveryPlan[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+};
+
+export type OperationalAction = {
+  id: number;
+  action_type: string;
+  plan_id: number | null;
+  status: "draft" | "pending_approval" | "approved" | "rejected" | "executed" | "cancelled";
+  before_state_json: string;
+  proposed_state_json: string;
+  expected_impact: string;
+  reason: string;
+  requested_at: string;
+  decided_at: string | null;
+  executed_at: string | null;
+  reviewer: string | null;
+  execution_result: string | null;
+};
+
+export const plansApi = {
+  generate: () => api.post<RecoveryPlan[]>("/plans/generate"),
+  list: (params: { page?: number; page_size?: number; kind?: string; status?: string }) =>
+    api.get<PlanPage>(`/plans${buildQuery(params)}`),
+  get: (id: number) => api.get<RecoveryPlan>(`/plans/${id}`),
+  submit: (id: number, actor?: string) =>
+    api.post<OperationalAction>(`/plans/${id}/submit`, { actor: actor ?? null }),
+};
+
+// ===== Actions (approvals) =====
+export type ActionPage = {
+  items: OperationalAction[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+};
+
+export const actionsApi = {
+  list: (params: { page?: number; page_size?: number; status?: string }) =>
+    api.get<ActionPage>(`/actions${buildQuery(params)}`),
+  get: (id: number) => api.get<OperationalAction>(`/actions/${id}`),
+  approve: (id: number, reviewer?: string, note?: string) =>
+    api.post<OperationalAction>(`/actions/${id}/approve`, { reviewer: reviewer ?? null, note: note ?? null }),
+  reject: (id: number, reviewer?: string, note?: string) =>
+    api.post<OperationalAction>(`/actions/${id}/reject`, { reviewer: reviewer ?? null, note: note ?? null }),
+  execute: (id: number, reviewer?: string) =>
+    api.post<OperationalAction>(`/actions/${id}/execute`, { reviewer: reviewer ?? null }),
+};
+
+// ===== Simulations =====
+export type SimulationScenario =
+  | "vehicle_unavailable" | "heavy_rain" | "urgent_added"
+  | "capacity_change" | "deadline_earlier" | "assignment_failed";
+
+export type Simulation = {
+  id: number;
+  scenario: SimulationScenario;
+  params_json: string;
+  baseline_metrics_json: string;
+  simulated_metrics_json: string;
+  diff_json: string;
+  explanation: string;
+  created_at: string;
+};
+
+export const simulationsApi = {
+  create: (scenario: SimulationScenario, params: Record<string, unknown>) =>
+    api.post<Simulation>("/simulations", { scenario, params }),
+  get: (id: number) => api.get<Simulation>(`/simulations/${id}`),
+};
