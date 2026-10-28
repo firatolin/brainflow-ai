@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api import (
-    health, deliveries, vehicles, incidents, risk, scan_runs, plans, simulations,
+    health, deliveries, vehicles, incidents, risk, scan_runs,
+    plans, simulations, actions, audit,
 )
 
 
@@ -30,6 +31,7 @@ def create_app() -> FastAPI:
         health.router, deliveries.router, vehicles.router,
         incidents.router, risk.router, scan_runs.router,
         plans.router, simulations.router,
+        actions.router, audit.router,
     ):
         app.include_router(r, prefix=prefix)
 

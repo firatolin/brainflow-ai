@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
 from app.models.recovery_plan import PlanKind, PlanStatus, RecoveryPlan
+from app.schemas.action import ActionRead, DecisionRequest, ExecuteRequest, SubmitRequest
 from app.schemas.common import Page
 from app.schemas.plan import PlanRead
-from app.services import plan_service
+from app.services import approval_service, plan_service
 
 
 router = APIRouter(prefix="/plans", tags=["plans"])
@@ -14,8 +15,7 @@ router = APIRouter(prefix="/plans", tags=["plans"])
 
 @router.post("/generate", response_model=list[PlanRead])
 def generate_plans(db: Session = Depends(get_db)):
-    plans = plan_service.generate_and_persist(db)
-    return plans
+    return plan_service.generate_and_persist(db)
 
 
 @router.get("", response_model=Page[PlanRead])
@@ -42,3 +42,8 @@ def get_plan(plan_id: int, db: Session = Depends(get_db)):
     if not p:
         raise HTTPException(404, "Plan not found")
     return p
+
+
+@router.post("/{plan_id}/submit", response_model=ActionRead)
+def submit_plan(plan_id: int, payload: SubmitRequest, db: Session = Depends(get_db)):
+    return approval_service.submit_plan(db, plan_id, actor=payload.actor)
