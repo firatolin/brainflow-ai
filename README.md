@@ -368,18 +368,23 @@ Full list in `docs/KNOWN_LIMITATIONS.md`. Highlights:
 
 ## Screenshots
 
-Capture these while running the app for the submission package:
+Captured from the running application (synthetic demonstration data):
 
-- `docs/screenshots/01-login.png`
-- `docs/screenshots/02-overview.png`
-- `docs/screenshots/03-deliveries.png`
-- `docs/screenshots/04-exceptions.png`
-- `docs/screenshots/05-recovery.png`
-- `docs/screenshots/06-approvals.png`
-- `docs/screenshots/07-simulation.png`
-- `docs/screenshots/08-audit.png`
+| Login | Overview |
+|---|---|
+| ![Login](docs/screenshots/01-login.png) | ![Overview](docs/screenshots/02-overview.png) |
 
-(You can also embed them here — just add `![Overview](docs/screenshots/02-overview.png)` under a `## Screenshots` header.)
+| Deliveries | Exceptions |
+|---|---|
+| ![Deliveries](docs/screenshots/03-deliveries.png) | ![Exceptions](docs/screenshots/04-exceptions.png) |
+
+| Recovery planning | Approvals |
+|---|---|
+| ![Recovery](docs/screenshots/05-recovery.png) | ![Approvals](docs/screenshots/06-approvals.png) |
+
+| Simulations | Audit trail |
+|---|---|
+| ![Simulations](docs/screenshots/07-simulation.png) | ![Audit](docs/screenshots/08-audit.png) |
 
 ## License / attribution
 

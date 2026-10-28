@@ -146,6 +146,14 @@ Full list in [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md). Summary:
 
 ---
 
+## Screenshots
+
+Captured from the running application (synthetic demonstration data):
+
+![Login](docs/screenshots/01-login.png) ![Overview](docs/screenshots/02-overview.png) ![Deliveries](docs/screenshots/03-deliveries.png) ![Exceptions](docs/screenshots/04-exceptions.png)
+
+![Recovery](docs/screenshots/05-recovery.png) ![Approvals](docs/screenshots/06-approvals.png) ![Simulations](docs/screenshots/07-simulation.png) ![Audit](docs/screenshots/08-audit.png)
+
 ## 9. Final submission materials
 
     brainflow-ai/
