@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.api import (
     health, deliveries, vehicles, incidents, risk, scan_runs,
     plans, simulations, actions, audit,
+    copilot, context, customer_drafts,
 )
 
 
@@ -17,7 +18,6 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
         openapi_url="/openapi.json",
     )
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
@@ -25,13 +25,13 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
     prefix = settings.API_PREFIX
     for r in (
         health.router, deliveries.router, vehicles.router,
         incidents.router, risk.router, scan_runs.router,
         plans.router, simulations.router,
         actions.router, audit.router,
+        copilot.router, context.router, customer_drafts.router,
     ):
         app.include_router(r, prefix=prefix)
 
