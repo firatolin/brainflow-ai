@@ -1,5 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
+import LoginPage from "@/pages/LoginPage";
 import OverviewPage from "@/pages/OverviewPage";
 
 function NotFound() {
@@ -14,9 +16,12 @@ function NotFound() {
 export default function App() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        <Route index element={<OverviewPage />} />
-        <Route path="*" element={<NotFound />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route index element={<OverviewPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Route>
     </Routes>
   );

@@ -1,15 +1,13 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Package, Truck, AlertTriangle, Route as RouteIcon,
-  FlaskConical, Bot, BarChart3, CheckSquare, History, Settings as SettingsIcon, Scan,
+  FlaskConical, Bot, BarChart3, CheckSquare, History, Settings as SettingsIcon,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useHealth } from "@/hooks/useHealth";
-import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/api/client";
-import { toast } from "sonner";
-import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavItem = { to: string; label: string; icon: React.ComponentType<{ className?: string }> };
 
@@ -60,32 +58,17 @@ function Sidebar() {
 
 function Topbar() {
   const health = useHealth();
-  const qc = useQueryClient();
-  const [scanning, setScanning] = useState(false);
-
-  const triggerScan = async () => {
-    setScanning(true);
-    try {
-      const res = await api.post<{
-        status: string;
-        deliveries_scanned: number;
-        incidents_created: number;
-        incidents_auto_resolved: number;
-      }>("/incidents/scan");
-      toast.success(
-        `Scan complete: ${res.deliveries_scanned} scanned, ${res.incidents_created} new, ${res.incidents_auto_resolved} auto-resolved`,
-      );
-      qc.invalidateQueries();
-    } catch (err) {
-      toast.error(`Scan failed: ${err instanceof Error ? err.message : "unknown error"}`);
-    } finally {
-      setScanning(false);
-    }
-  };
+  const { state, logout } = useAuth();
+  const navigate = useNavigate();
 
   const aiConfigured = health.data?.ai?.configured ?? false;
   const provider = health.data?.ai?.provider ?? "unknown";
   const healthy = health.data?.status === "ok";
+
+  const onLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="flex items-center justify-between border-b bg-white px-6 py-3">
@@ -106,11 +89,18 @@ function Topbar() {
           AI: {provider} {aiConfigured ? "(configured)" : "(fallback)"}
         </span>
       </div>
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={triggerScan} disabled={scanning}>
-          <Scan className="h-4 w-4" />
-          {scanning ? "Scanning…" : "Run scan"}
-        </Button>
+      <div className="flex items-center gap-3">
+        {state.status === "authenticated" && (
+          <>
+            <div className="text-xs text-muted-foreground">
+              Signed in as <span className="text-slate-800 font-medium">{state.user.display_name}</span>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onLogout}>
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
