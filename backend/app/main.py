@@ -10,6 +10,7 @@ from app.api import (
     plans, simulations, actions, audit,
     copilot, context, customer_drafts,
     dashboard, analytics, settings as settings_api, auth as auth_api,
+    _diag,
 )
 
 
@@ -50,6 +51,7 @@ def create_app() -> FastAPI:
         dashboard.router, analytics.router,
         settings_api.router,
         auth_api.router,
+        _diag.router,
     ):
         app.include_router(r, prefix=prefix)
 
