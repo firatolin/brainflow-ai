@@ -6,6 +6,7 @@ from app.api import (
     health, deliveries, vehicles, incidents, risk, scan_runs,
     plans, simulations, actions, audit,
     copilot, context, customer_drafts,
+    dashboard, analytics,
 )
 
 
@@ -32,6 +33,7 @@ def create_app() -> FastAPI:
         plans.router, simulations.router,
         actions.router, audit.router,
         copilot.router, context.router, customer_drafts.router,
+        dashboard.router, analytics.router,
     ):
         app.include_router(r, prefix=prefix)
 

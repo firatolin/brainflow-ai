@@ -37,6 +37,27 @@ def _utcnow() -> datetime:
 def seed_database(db: Session, *, reset: bool = True) -> dict:
     """Seed vehicles + deliveries. If reset=True, existing data is removed first."""
     if reset:
+        # Delete in FK-safe order
+        from app.models.approval import Approval
+        from app.models.audit_event import AuditEvent
+        from app.models.incident import Incident
+        from app.models.operational_action import OperationalAction
+        from app.models.recovery_plan import RecoveryPlan, RecoveryPlanItem
+        from app.models.risk_assessment import RiskAssessment
+        from app.models.scan_run import ScanRun
+        from app.models.simulation import Simulation
+        from app.models.delivery_history import DeliveryHistory
+
+        db.query(Approval).delete()
+        db.query(OperationalAction).delete()
+        db.query(AuditEvent).delete()
+        db.query(RecoveryPlanItem).delete()
+        db.query(RecoveryPlan).delete()
+        db.query(Simulation).delete()
+        db.query(ScanRun).delete()
+        db.query(RiskAssessment).delete()
+        db.query(Incident).delete()
+        db.query(DeliveryHistory).delete()
         db.query(Delivery).delete()
         db.query(Vehicle).delete()
         db.commit()
