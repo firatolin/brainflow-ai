@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import settings
 from app.integrations.llm_client import get_llm_provider
+from app.services import scheduler as scheduler_service
 
 
 router = APIRouter(tags=["health"])
@@ -23,15 +24,18 @@ def health(db: Session = Depends(get_db)) -> dict:
         db_error = str(exc)
 
     provider = get_llm_provider()
+    next_run = scheduler_service.next_run_summary()
 
     return {
         "status": "ok" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "env": settings.APP_ENV,
         "database": {"ok": db_ok, "error": db_error},
-        "ai": {
-            "provider": provider.name,
-            "configured": provider.available,
+        "ai": {"provider": provider.name, "configured": provider.available},
+        "scheduler": {
+            "enabled": settings.SCHEDULER_ENABLED,
+            "interval_minutes": settings.SCAN_INTERVAL_MINUTES,
+            "next_run_at": next_run,
         },
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }

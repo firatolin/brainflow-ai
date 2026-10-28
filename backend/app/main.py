@@ -1,13 +1,26 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.services import scheduler as scheduler_service
 from app.api import (
     health, deliveries, vehicles, incidents, risk, scan_runs,
     plans, simulations, actions, audit,
     copilot, context, customer_drafts,
     dashboard, analytics, settings as settings_api, auth as auth_api,
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    scheduler_service.start_scheduler()
+    try:
+        yield
+    finally:
+        scheduler_service.stop_scheduler()
 
 
 def create_app() -> FastAPI:
@@ -18,6 +31,7 @@ def create_app() -> FastAPI:
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/openapi.json",
+        lifespan=lifespan,
     )
     app.add_middleware(
         CORSMiddleware,

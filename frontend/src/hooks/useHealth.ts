@@ -7,6 +7,11 @@ export type Health = {
   env: string;
   database: { ok: boolean; error: string | null };
   ai: { provider: string; configured: boolean };
+  scheduler: {
+    enabled: boolean;
+    interval_minutes: number;
+    next_run_at: string | null;
+  };
   timestamp: string;
 };
 

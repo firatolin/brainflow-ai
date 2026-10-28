@@ -88,6 +88,14 @@ function Topbar() {
         <span className="text-xs text-muted-foreground">
           AI: {provider} {aiConfigured ? "(configured)" : "(fallback)"}
         </span>
+        {health.data?.scheduler?.enabled && (
+          <span className="text-xs text-muted-foreground">
+            · next scan:{" "}
+            {health.data.scheduler.next_run_at
+              ? new Date(health.data.scheduler.next_run_at).toLocaleTimeString()
+              : `in ${health.data.scheduler.interval_minutes}m`}
+          </span>
+        )}
       </div>
       <div className="flex items-center gap-3">
         {state.status === "authenticated" && (
