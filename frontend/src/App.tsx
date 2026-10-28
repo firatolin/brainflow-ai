@@ -3,6 +3,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import LoginPage from "@/pages/LoginPage";
 import OverviewPage from "@/pages/OverviewPage";
+import DeliveriesPage from "@/pages/deliveries/DeliveriesPage";
+import DeliveryDetailPage from "@/pages/deliveries/DeliveryDetailPage";
+import FleetPage from "@/pages/fleet/FleetPage";
 
 function NotFound() {
   return (
@@ -20,6 +23,9 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route index element={<OverviewPage />} />
+          <Route path="deliveries" element={<DeliveriesPage />} />
+          <Route path="deliveries/:id" element={<DeliveryDetailPage />} />
+          <Route path="fleet" element={<FleetPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
