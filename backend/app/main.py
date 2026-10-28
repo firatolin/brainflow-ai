@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import health, deliveries, vehicles, incidents, risk, scan_runs
+from app.api import (
+    health, deliveries, vehicles, incidents, risk, scan_runs, plans, simulations,
+)
 
 
 def create_app() -> FastAPI:
@@ -24,12 +26,12 @@ def create_app() -> FastAPI:
     )
 
     prefix = settings.API_PREFIX
-    app.include_router(health.router, prefix=prefix)
-    app.include_router(deliveries.router, prefix=prefix)
-    app.include_router(vehicles.router, prefix=prefix)
-    app.include_router(incidents.router, prefix=prefix)
-    app.include_router(risk.router, prefix=prefix)
-    app.include_router(scan_runs.router, prefix=prefix)
+    for r in (
+        health.router, deliveries.router, vehicles.router,
+        incidents.router, risk.router, scan_runs.router,
+        plans.router, simulations.router,
+    ):
+        app.include_router(r, prefix=prefix)
 
     @app.get("/", include_in_schema=False)
     def root() -> dict[str, str]:
