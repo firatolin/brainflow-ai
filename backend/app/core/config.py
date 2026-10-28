@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     EXTERNAL_TIMEOUT_SECONDS: float = 6.0
     PUBLIC_HOLIDAY_COUNTRY: str = "ET"
 
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_DISPLAY_NAME: str = "Admin"
+
     GEMINI_API_KEY: str | None = None
     GEMINI_MODEL: str = "gemini-2.0-flash"
     GEMINI_TIMEOUT_SECONDS: float = 20.0

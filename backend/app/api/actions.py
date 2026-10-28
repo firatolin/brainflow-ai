@@ -6,6 +6,7 @@ from app.core.deps import Pagination, pagination_params
 from app.models.operational_action import ActionStatus, OperationalAction
 from app.schemas.action import ActionRead, DecisionRequest, ExecuteRequest, SubmitRequest
 from app.schemas.common import Page
+from app.core.config import settings
 from app.services import approval_service
 
 
@@ -38,14 +39,14 @@ def get_action(action_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{action_id}/approve", response_model=ActionRead)
 def approve(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db)):
-    return approval_service.approve_action(db, action_id, reviewer=payload.reviewer, note=payload.note)
+    return approval_service.approve_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME, note=payload.note)
 
 
 @router.post("/{action_id}/reject", response_model=ActionRead)
 def reject(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db)):
-    return approval_service.reject_action(db, action_id, reviewer=payload.reviewer, note=payload.note)
+    return approval_service.reject_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME, note=payload.note)
 
 
 @router.post("/{action_id}/execute", response_model=ActionRead)
 def execute(action_id: int, payload: ExecuteRequest, db: Session = Depends(get_db)):
-    return approval_service.execute_action(db, action_id, reviewer=payload.reviewer)
+    return approval_service.execute_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME)

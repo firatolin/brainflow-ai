@@ -24,13 +24,13 @@ class ActionRead(BaseModel):
 
 
 class DecisionRequest(BaseModel):
-    reviewer: str = Field(min_length=1, max_length=120)
+    reviewer: Optional[str] = Field(default=None, max_length=120)
     note: Optional[str] = Field(default=None, max_length=2000)
 
 
 class SubmitRequest(BaseModel):
-    actor: str = Field(default="operator", min_length=1, max_length=120)
+    actor: Optional[str] = Field(default=None, max_length=120)
 
 
 class ExecuteRequest(BaseModel):
-    reviewer: str = Field(default="operator", min_length=1, max_length=120)
+    reviewer: Optional[str] = Field(default=None, max_length=120)

@@ -7,6 +7,7 @@ from app.models.recovery_plan import PlanKind, PlanStatus, RecoveryPlan
 from app.schemas.action import ActionRead, DecisionRequest, ExecuteRequest, SubmitRequest
 from app.schemas.common import Page
 from app.schemas.plan import PlanRead
+from app.core.config import settings
 from app.services import approval_service, plan_service
 
 
@@ -46,4 +47,4 @@ def get_plan(plan_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{plan_id}/submit", response_model=ActionRead)
 def submit_plan(plan_id: int, payload: SubmitRequest, db: Session = Depends(get_db)):
-    return approval_service.submit_plan(db, plan_id, actor=payload.actor)
+    return approval_service.submit_plan(db, plan_id, actor=payload.actor or settings.ADMIN_DISPLAY_NAME)

@@ -131,3 +131,26 @@ def test_stale_plan_blocked_on_execution(client):
     assert r.status_code == 409
     detail = r.json()["detail"]
     assert "stale" in str(detail).lower()
+
+
+def test_admin_defaults_when_reviewer_omitted(client):
+    """If reviewer is omitted, backend uses ADMIN_DISPLAY_NAME (default 'Admin')."""
+    v = _mk_vehicle(client, code="V-ADM", cap=10)
+    _mk_delivery(client, "T-ADM", vehicle_id=v["id"])
+    _mk_delivery(client, "T-ADM-2", vehicle_id=None, priority="urgent")
+    plan = _generate_and_pick_feasible(client)
+
+    # submit with no actor
+    r = client.post(f"/api/plans/{plan['id']}/submit", json={})
+    assert r.status_code == 200
+    action = r.json()
+
+    # approve with no reviewer
+    r = client.post(f"/api/actions/{action['id']}/approve", json={})
+    assert r.status_code == 200
+    assert r.json()["reviewer"] == "Admin"
+
+    # execute with no reviewer
+    r = client.post(f"/api/actions/{action['id']}/execute", json={})
+    assert r.status_code == 200
+    assert r.json()["status"] == "executed"
