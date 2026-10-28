@@ -1,0 +1,27 @@
+# --- Core web ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic>=2.10
+pydantic-settings>=2.7
+python-multipart==0.0.20
+
+# --- Database ---
+SQLAlchemy>=2.0.44
+alembic>=1.16.5
+
+# --- Config ---
+python-dotenv==1.0.1
+
+# --- Scheduler ---
+APScheduler==3.11.0
+
+# --- External HTTP ---
+httpx==0.28.1
+
+# --- AI ---
+google-genai>=0.8.3
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
