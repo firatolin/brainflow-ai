@@ -1,6 +1,6 @@
 """Deterministic seed data for BrainFlow AI demo.
 
-Creates 6 vehicles and 40 deliveries across zones, with a scenario designed
+Creates 6 vehicles and 43 deliveries across zones, with a scenario designed
 to exercise: rain exposure, an unavailable vehicle, two urgent deliveries,
 capacity pressure on a small-capacity vehicle, and a spread of risk/priority.
 """
