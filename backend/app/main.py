@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import health
+from app.api import health, deliveries, vehicles
 
 
 def create_app() -> FastAPI:
@@ -24,6 +24,8 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health.router, prefix=settings.API_PREFIX)
+    app.include_router(deliveries.router, prefix=settings.API_PREFIX)
+    app.include_router(vehicles.router, prefix=settings.API_PREFIX)
 
     @app.get("/", include_in_schema=False)
     def root() -> dict[str, str]:
