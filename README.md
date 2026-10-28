@@ -4,7 +4,8 @@
 
 > **This is a demonstration application.** All data, deliveries, vehicles, and outcomes are synthetic and clearly labelled as demonstration data. There are no real external logistics integrations, and nothing is sent to real customers.
 
----
+![BrainFlow AI — Overview dashboard](docs/screenshots/02-overview.png)
+
 
 ## Problem it solves
 
