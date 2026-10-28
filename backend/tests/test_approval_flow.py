@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
 
 
+
+
 def _mk_vehicle(client, code="V1", cap=5, available=True, status="available"):
     return client.post("/api/vehicles", json=dict(
         code=code, vehicle_type="van", capacity=cap, status=status,

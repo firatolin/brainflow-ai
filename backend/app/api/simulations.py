@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.simulation import Simulation
 from app.schemas.simulation import SimulationCreate, SimulationRead
 from app.services import simulator
@@ -13,7 +15,7 @@ router = APIRouter(prefix="/simulations", tags=["simulations"])
 
 
 @router.post("", response_model=SimulationRead)
-def create_simulation(payload: SimulationCreate, db: Session = Depends(get_db)):
+def create_simulation(payload: SimulationCreate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     try:
         result = simulator.run_simulation(db, payload.scenario.value, payload.params)
     except ValueError as e:

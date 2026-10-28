@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.models.delivery import Delivery, DeliveryPriority, DeliveryStatus
 from app.models.vehicle import Vehicle, VehicleStatus, VehicleType
+from app.services import auth_service
 
 
 ZONES = ["central", "north", "south", "east", "west", "airport"]
@@ -165,9 +166,13 @@ def seed_database(db: Session, *, reset: bool = True) -> dict:
     db.add_all(deliveries)
     db.commit()
 
+    admin = auth_service.ensure_admin_user(db)
+
     return {
         "vehicles": len(vehicles),
         "deliveries": len(deliveries),
         "unavailable_vehicles": [v.code for v in vehicles if not v.available],
         "urgent_deliveries": [d.tracking_number for d in deliveries if d.priority == DeliveryPriority.URGENT],
+        "admin_username": admin.username,
+        "admin_display_name": admin.display_name,
     }

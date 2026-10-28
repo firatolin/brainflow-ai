@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.vehicle import Vehicle, VehicleStatus
 from app.schemas.common import Page
 from app.schemas.vehicle import VehicleCreate, VehicleRead, VehicleUpdate
@@ -34,7 +36,7 @@ def list_vehicles(
 
 
 @router.post("", response_model=VehicleRead, status_code=status.HTTP_201_CREATED)
-def create_vehicle(payload: VehicleCreate, db: Session = Depends(get_db)):
+def create_vehicle(payload: VehicleCreate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     if db.query(Vehicle).filter(Vehicle.code == payload.code).first():
         raise HTTPException(status_code=409, detail=f"Vehicle code '{payload.code}' already exists")
     v = Vehicle(**payload.model_dump())
@@ -53,7 +55,7 @@ def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{vehicle_id}", response_model=VehicleRead)
-def update_vehicle(vehicle_id: int, payload: VehicleUpdate, db: Session = Depends(get_db)):
+def update_vehicle(vehicle_id: int, payload: VehicleUpdate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     v = db.get(Vehicle, vehicle_id)
     if not v:
         raise HTTPException(status_code=404, detail="Vehicle not found")

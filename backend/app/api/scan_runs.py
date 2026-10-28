@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.scan_run import ScanRun
 from app.schemas.common import Page
 from app.schemas.scan import ScanRunRead
@@ -25,5 +27,5 @@ def list_scan_runs(
 
 
 @router.post("", response_model=ScanRunRead)
-def trigger_scan_run(db: Session = Depends(get_db)):
+def trigger_scan_run(db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return scan_service.run_scan(db, triggered_by="manual")

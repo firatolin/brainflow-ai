@@ -33,6 +33,10 @@ class Settings(BaseSettings):
 
     ADMIN_USERNAME: str = "admin"
     ADMIN_DISPLAY_NAME: str = "Admin"
+    ADMIN_PASSWORD: str = "BrainFlow@2026"
+    SESSION_TTL_HOURS: int = 8
+    SESSION_COOKIE_NAME: str = "brainflow_session"
+    COOKIE_SECURE: bool = False  # True in production with HTTPS
 
     GEMINI_API_KEY: str | None = None
     GEMINI_MODEL: str = "gemini-2.0-flash"

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.delivery import Delivery, DeliveryPriority, DeliveryStatus
 from app.models.delivery_history import DeliveryHistory
 from app.schemas.common import Page
@@ -67,7 +69,7 @@ def list_deliveries(
 
 
 @router.post("", response_model=DeliveryRead, status_code=status.HTTP_201_CREATED)
-def create_delivery(payload: DeliveryCreate, db: Session = Depends(get_db)):
+def create_delivery(payload: DeliveryCreate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     if db.query(Delivery).filter(Delivery.tracking_number == payload.tracking_number).first():
         raise HTTPException(status_code=409, detail=f"Tracking number '{payload.tracking_number}' already exists")
     return delivery_service.create_delivery(db, payload.model_dump())
@@ -82,17 +84,17 @@ def get_delivery(delivery_id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{delivery_id}", response_model=DeliveryRead)
-def update_delivery(delivery_id: int, payload: DeliveryUpdate, db: Session = Depends(get_db)):
+def update_delivery(delivery_id: int, payload: DeliveryUpdate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return delivery_service.update_delivery(db, delivery_id, payload.model_dump(exclude_unset=True))
 
 
 @router.post("/{delivery_id}/assign", response_model=DeliveryRead)
-def assign_delivery(delivery_id: int, payload: DeliveryAssign, db: Session = Depends(get_db)):
+def assign_delivery(delivery_id: int, payload: DeliveryAssign, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return delivery_service.assign_delivery(db, delivery_id, payload.vehicle_id)
 
 
 @router.post("/{delivery_id}/status", response_model=DeliveryRead)
-def change_status(delivery_id: int, payload: DeliveryStatusChange, db: Session = Depends(get_db)):
+def change_status(delivery_id: int, payload: DeliveryStatusChange, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return delivery_service.change_status(db, delivery_id, payload.status, payload.note)
 
 

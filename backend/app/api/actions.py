@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.operational_action import ActionStatus, OperationalAction
 from app.schemas.action import ActionRead, DecisionRequest, ExecuteRequest, SubmitRequest
 from app.schemas.common import Page
@@ -38,15 +40,15 @@ def get_action(action_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{action_id}/approve", response_model=ActionRead)
-def approve(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db)):
+def approve(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return approval_service.approve_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME, note=payload.note)
 
 
 @router.post("/{action_id}/reject", response_model=ActionRead)
-def reject(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db)):
+def reject(action_id: int, payload: DecisionRequest, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return approval_service.reject_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME, note=payload.note)
 
 
 @router.post("/{action_id}/execute", response_model=ActionRead)
-def execute(action_id: int, payload: ExecuteRequest, db: Session = Depends(get_db)):
+def execute(action_id: int, payload: ExecuteRequest, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return approval_service.execute_action(db, action_id, reviewer=payload.reviewer or settings.ADMIN_DISPLAY_NAME)

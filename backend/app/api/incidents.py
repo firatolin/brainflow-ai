@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.incident import Incident, IncidentSeverity, IncidentStatus
 from app.schemas.common import Page
 from app.schemas.incident import IncidentRead, IncidentUpdate
@@ -53,13 +55,13 @@ def list_incidents(
 
 
 @router.post("/scan", response_model=ScanRunRead)
-def trigger_scan(db: Session = Depends(get_db)):
+def trigger_scan(db: Session = Depends(get_db), _user: User = Depends(require_user)):
     run = scan_service.run_scan(db, triggered_by="manual")
     return run
 
 
 @router.patch("/{incident_id}", response_model=IncidentRead)
-def update_incident(incident_id: int, payload: IncidentUpdate, db: Session = Depends(get_db)):
+def update_incident(incident_id: int, payload: IncidentUpdate, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     inc = db.get(Incident, incident_id)
     if not inc:
         raise HTTPException(404, "Incident not found")

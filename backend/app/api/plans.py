@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import Pagination, pagination_params
+from app.core.auth import require_user
+from app.models.user import User
 from app.models.recovery_plan import PlanKind, PlanStatus, RecoveryPlan
 from app.schemas.action import ActionRead, DecisionRequest, ExecuteRequest, SubmitRequest
 from app.schemas.common import Page
@@ -15,7 +17,7 @@ router = APIRouter(prefix="/plans", tags=["plans"])
 
 
 @router.post("/generate", response_model=list[PlanRead])
-def generate_plans(db: Session = Depends(get_db)):
+def generate_plans(db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return plan_service.generate_and_persist(db)
 
 
@@ -46,5 +48,5 @@ def get_plan(plan_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{plan_id}/submit", response_model=ActionRead)
-def submit_plan(plan_id: int, payload: SubmitRequest, db: Session = Depends(get_db)):
+def submit_plan(plan_id: int, payload: SubmitRequest, db: Session = Depends(get_db), _user: User = Depends(require_user)):
     return approval_service.submit_plan(db, plan_id, actor=payload.actor or settings.ADMIN_DISPLAY_NAME)

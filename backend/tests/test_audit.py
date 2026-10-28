@@ -1,3 +1,4 @@
+
 def test_audit_events_paginated_and_searchable(client):
     # create an event by submitting a plan
     v = client.post("/api/vehicles", json=dict(
