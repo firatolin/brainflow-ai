@@ -365,3 +365,105 @@ export const simulationsApi = {
     api.post<Simulation>("/simulations", { scenario, params }),
   get: (id: number) => api.get<Simulation>(`/simulations/${id}`),
 };
+
+// ===== Copilot =====
+export type CopilotResponse = {
+  question: string;
+  answer: string;
+  source: "llm" | "fallback";
+  tool_used: string;
+  facts: Record<string, unknown>;
+};
+
+export const copilotApi = {
+  query: (question: string) => api.post<CopilotResponse>("/copilot/query", { question }),
+};
+
+// ===== Analytics =====
+export type AnalyticsSummary = {
+  measured: {
+    note: string;
+    total_deliveries: number;
+    delivered: number;
+    failed: number;
+    cancelled: number;
+    completion_rate_pct: number | null;
+    on_time_rate_pct: number | null;
+    delay_rate_pct: number | null;
+    avg_delay_minutes: number | null;
+    cost_estimate_active: number;
+    cost_estimate_delivered: number;
+  };
+  estimated: {
+    note: string;
+    risk_distribution: { low: number; medium: number; high: number; critical: number };
+    vehicle_utilization: Array<{
+      vehicle_id: number;
+      code: string;
+      capacity: number;
+      active: number;
+      available: boolean;
+      utilization_pct: number;
+    }>;
+  };
+  incidents: {
+    total: number;
+    by_kind: Record<string, number>;
+    avg_resolution_minutes: number | null;
+  };
+  plans: Array<{
+    id: number;
+    kind: string;
+    feasible: boolean;
+    late_count: number;
+    total_delay_minutes: number;
+    extra_cost: number;
+    changes: number;
+  }>;
+  simulations: { count: number; note: string };
+  trend_14d: Array<{ date: string; delivered: number; incidents: number }>;
+  generated_at: string;
+};
+
+export const analyticsApi = {
+  summary: () => api.get<AnalyticsSummary>("/analytics/summary"),
+};
+
+// ===== Audit =====
+export type AuditEvent = {
+  id: number;
+  event_type: string;
+  entity_type: string | null;
+  entity_id: number | null;
+  actor: string;
+  context_json: string;
+  created_at: string;
+};
+
+export type AuditPage = {
+  items: AuditEvent[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+};
+
+export const auditApi = {
+  list: (params: {
+    page?: number; page_size?: number;
+    event_type?: string; entity_type?: string; entity_id?: number; q?: string;
+  }) => api.get<AuditPage>(`/audit-events${buildQuery(params)}`),
+};
+
+// ===== Settings =====
+export type AppSettings = {
+  app_name: string;
+  env: string;
+  admin: { username: string; display_name: string };
+  auth_mode: string;
+  note: string;
+};
+
+export const settingsApi = {
+  get: () => api.get<AppSettings>("/settings"),
+};

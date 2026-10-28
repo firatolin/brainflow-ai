@@ -9,6 +9,11 @@ import FleetPage from "@/pages/fleet/FleetPage";
 import ExceptionsPage from "@/pages/exceptions/ExceptionsPage";
 import RecoveryPage from "@/pages/recovery/RecoveryPage";
 import SimulationsPage from "@/pages/simulations/SimulationsPage";
+import CopilotPage from "@/pages/copilot/CopilotPage";
+import AnalyticsPage from "@/pages/analytics/AnalyticsPage";
+import ApprovalsPage from "@/pages/approvals/ApprovalsPage";
+import AuditPage from "@/pages/audit/AuditPage";
+import SettingsPage from "@/pages/settings/SettingsPage";
 
 function NotFound() {
   return (
@@ -32,6 +37,11 @@ export default function App() {
           <Route path="exceptions" element={<ExceptionsPage />} />
           <Route path="recovery" element={<RecoveryPage />} />
           <Route path="simulations" element={<SimulationsPage />} />
+          <Route path="copilot" element={<CopilotPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="approvals" element={<ApprovalsPage />} />
+          <Route path="audit" element={<AuditPage />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
