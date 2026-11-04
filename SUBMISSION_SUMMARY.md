@@ -100,21 +100,4 @@ brainflow-ai/
 
 Repository: github.com/firatolin/brainflow-ai
 
-## Suggested message to Kidus
 
-Hi Kidus,
-
-BrainFlow AI is ready for review: github.com/firatolin/brainflow-ai
-
-A full-stack logistics operations platform with a deterministic risk engine, exception center, recovery planner, what-if simulator, human-approval workflow with stale-plan rejection and idempotent execution, bounded AI copilot with deterministic fallback, and an append-only audit trail. Working end-to-end on synthetic demo data.
-
-Highlights:
-
-- 73 backend tests + 16 frontend tests, all passing
-- Type check, lint, and production build all green
-- Runs on pytest, npm run test, npm run build with zero external services
-- AI and external APIs are optional — the app works fully offline via deterministic fallbacks
-
-Start with README.md, then docs/DEMO_GUIDE.md for a 15-minute walkthrough. Known limitations are honestly documented in docs/KNOWN_LIMITATIONS.md.
-
-Thank you — happy to walk through anything during the review.

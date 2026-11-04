@@ -4,8 +4,7 @@
 
 > **This is a demonstration application.** All data, deliveries, vehicles, and outcomes are synthetic and clearly labelled as demonstration data. There are no real external logistics integrations, and nothing is sent to real customers.
 
-![BrainFlow AI — Overview dashboard](docs/screenshots/02-overview.png)
-
+---
 
 ## Problem it solves
 
@@ -369,23 +368,16 @@ Full list in `docs/KNOWN_LIMITATIONS.md`. Highlights:
 
 ## Screenshots
 
-Captured from the running application (synthetic demonstration data):
 
-| Login | Overview |
-|---|---|
-| ![Login](docs/screenshots/01-login.png) | ![Overview](docs/screenshots/02-overview.png) |
+- `docs/screenshots/01-login.png`
+- `docs/screenshots/02-overview.png`
+- `docs/screenshots/03-deliveries.png`
+- `docs/screenshots/04-exceptions.png`
+- `docs/screenshots/05-recovery.png`
+- `docs/screenshots/06-approvals.png`
+- `docs/screenshots/07-simulation.png`
+- `docs/screenshots/08-audit.png`
 
-| Deliveries | Exceptions |
-|---|---|
-| ![Deliveries](docs/screenshots/03-deliveries.png) | ![Exceptions](docs/screenshots/04-exceptions.png) |
-
-| Recovery planning | Approvals |
-|---|---|
-| ![Recovery](docs/screenshots/05-recovery.png) | ![Approvals](docs/screenshots/06-approvals.png) |
-
-| Simulations | Audit trail |
-|---|---|
-| ![Simulations](docs/screenshots/07-simulation.png) | ![Audit](docs/screenshots/08-audit.png) |
 
 ## License / attribution
 
