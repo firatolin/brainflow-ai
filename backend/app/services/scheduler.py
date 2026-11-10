@@ -52,15 +52,20 @@ def _job() -> None:
 
 
 def start_scheduler() -> BackgroundScheduler | None:
+    import os
     logger.info(
-        "start_scheduler called: enabled=%s interval=%sm db=%s",
+        "start_scheduler called: enabled=%s interval=%sm db=%s vercel=%s",
         settings.SCHEDULER_ENABLED,
         settings.SCAN_INTERVAL_MINUTES,
         settings.DATABASE_URL.split("/")[-1],
+        bool(os.environ.get("VERCEL")),
     )
     global _scheduler
     if _scheduler is not None:
         return _scheduler
+    if os.environ.get("VERCEL"):
+        logger.info("Scheduler skipped: Vercel serverless environment")
+        return None
     if not settings.SCHEDULER_ENABLED:
         logger.info("Scheduler disabled (SCHEDULER_ENABLED=false)")
         return None

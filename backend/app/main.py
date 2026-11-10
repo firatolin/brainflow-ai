@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.database import Base, engine, SessionLocal
 from app.services import scheduler as scheduler_service
 from app.api import (
     health, deliveries, vehicles, incidents, risk, scan_runs,
@@ -13,10 +15,28 @@ from app.api import (
     _diag,
 )
 
+# Ensure all ORM models are registered on Base.metadata
+from app.models import *  # noqa: F401,F403
+
+logger = logging.getLogger("brainflow.startup")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # Startup: ensure schema + admin user exist (idempotent, safe for serverless)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception:  # noqa: BLE001
+        logger.exception("DB create_all failed")
+    try:
+        from app.services import auth_service
+        db = SessionLocal()
+        try:
+            auth_service.ensure_admin_user(db)
+        finally:
+            db.close()
+    except Exception:  # noqa: BLE001
+        logger.exception("Admin seed failed")
     scheduler_service.start_scheduler()
     try:
         yield
@@ -37,6 +57,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
+        allow_origin_regex=r"https://.*\.vercel\.app",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

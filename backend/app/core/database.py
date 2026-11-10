@@ -2,6 +2,7 @@ from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 
@@ -21,6 +22,7 @@ engine = create_engine(
     connect_args=connect_args,
     future=True,
     echo=False,
+    poolclass=NullPool if _db_url.startswith("postgresql") else None,
 )
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)

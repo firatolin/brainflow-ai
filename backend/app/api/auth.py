@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -12,25 +12,28 @@ from app.services import auth_service
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def _set_cookie(response: Response, token: str) -> None:
+def _set_cookie(response: Response, token: str, secure: bool | None = None) -> None:
+    if secure is None:
+        secure = settings.COOKIE_SECURE
     response.set_cookie(
         key=auth_service.SESSION_COOKIE,
         value=token,
         httponly=True,
         samesite="lax",
-        secure=settings.COOKIE_SECURE,
+        secure=secure,
         max_age=settings.SESSION_TTL_HOURS * 3600,
         path="/",
     )
 
 
 @router.post("/login", response_model=UserRead)
-def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)):
+def login(payload: LoginRequest, response: Response, request: Request, db: Session = Depends(get_db)):
     user = auth_service.authenticate(db, payload.username, payload.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = auth_service.create_session(db, user)
-    _set_cookie(response, token)
+    is_https = request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
+    _set_cookie(response, token, secure=settings.COOKIE_SECURE or is_https)
     return user
 
 

@@ -21,13 +21,29 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown } =
     finalHeaders["Content-Type"] = "application/json";
     body = JSON.stringify(json);
   }
-  const resp = await fetch(`${BASE}${path}`, { ...rest, headers: finalHeaders, body });
+  const resp = await fetch(`${BASE}${path}`, {
+    ...rest,
+    headers: finalHeaders,
+    body,
+    credentials: "include",
+  });
   const text = await resp.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
   if (!resp.ok) {
     const detail = (data as { detail?: unknown } | null)?.detail;
     const message =
-      typeof detail === "string" ? detail : resp.statusText || "Request failed";
+      typeof detail === "string"
+        ? detail
+        : typeof data === "string" && data
+          ? data
+          : resp.statusText || "Request failed";
     throw new ApiError(resp.status, message, data);
   }
   return data as T;
