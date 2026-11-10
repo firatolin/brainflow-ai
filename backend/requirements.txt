@@ -30,4 +30,4 @@ pytest-cov==6.0.0
 #-- we are gougntio implement the baseocs of this documentaion is this prfjkf
 # another rinf to o panifofd caodfadfa]fhjeod
 #vadfcadc=asfbajd= abdfajojdfb qnja[ADCUBDSJBJSADJRNOER IOASFBAOSA]xadhfjadf  fad  oe thibf  oetb beu clear 9s cth
-passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0
